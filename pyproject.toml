@@ -1,0 +1,32 @@
+[project]
+name = "port"
+version = "0.1.0"
+requires-python = ">=3.13"
+
+dependencies = [
+    "matplotlib>=3.10.6",
+    "numpy>=2.3.3",
+    "pandas>=2.3.3",
+    "polars>=1.33.1",
+    "polygon-api-client>=1.15.4",
+    "pyarrow>=21.0.0",
+    "seaborn>=0.13.2",
+    "skfolio>=0.13.0",
+]
+
+
+[tool.ruff]
+line-length = 70
+extend-select = ["I"]
+
+[tool.ruff.format]
+quote-style="single"
+
+
+
+
+[tool.basedpyright]
+reportMissingImports = "error"
+reportMissingTypeStubs = false
+typeCheckingMode = "off"
+
