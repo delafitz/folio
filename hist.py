@@ -8,10 +8,6 @@ from dates import get_dt_span, ts_to_date
 API_KEY = 'T9J9ukxYu5PlFfbbphx4KLkdoSVJmnF7'
 HIST_STORE = './cache/hist_data'
 
-INDICES = 'SPY,QQQ,IWM'
-SPDRS = 'XLF,XLK,XLV,XLC,XLE,XLI,XLY,XRT,XLU,XLP,KRE,XBI,XME,XOP,XHB'
-ISHARES = 'MTUM,SOXX,IGV,IYR,ITB,IBB'
-OTHER = 'GLD,USO,IBIT'
 
 HIST_WINDOW = 365
 
@@ -19,17 +15,6 @@ BASKET_SCHEMA = {
     'date': pl.String,
     'close': pl.Float32,
 }
-
-
-def get_etf_baskets(index_only=False, factor_only=False):
-    if index_only:
-        etfs = [INDICES]
-    elif factor_only:
-        etfs = [SPDRS, ISHARES, OTHER]
-    else:
-        etfs = [INDICES, SPDRS, ISHARES, OTHER]
-
-    return [sym for syms in etfs for sym in syms.split(',')]
 
 
 def fetch_hist(symbols):
@@ -43,10 +28,12 @@ def fetch_hist(symbols):
                 symbol.upper(), 1, 'day', from_dt, to_dt
             )
         ]
-        df = pl.DataFrame(hist, schema=BASKET_SCHEMA, orient='row')
-        df = df.rename({'close': symbol})
+        df = pl.DataFrame(
+            hist, schema=BASKET_SCHEMA, orient='row'
+        ).rename({'close': symbol})
         hists.append(df)
     df_all = pl.concat(hists, how='align_left')
+    print(df_all.head())
     return df_all
 
 
@@ -61,7 +48,7 @@ def write_cache(hist, name):
     )
 
 
-def get_returns(symbols, name, force_fetch=False):
+def get_returns(name, symbols, force_fetch=False):
     hist = get_cache(name)
     if hist is None or force_fetch:
         hist = fetch_hist(symbols)
@@ -69,4 +56,4 @@ def get_returns(symbols, name, force_fetch=False):
         write_cache(hist, name)
         return hist.with_columns(
             pl.all().exclude('date').pct_change()
-        ).drop_nulls()  # [-HIST_WINDOW:]
+        ).drop_nulls()
