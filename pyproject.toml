@@ -13,6 +13,7 @@ dependencies = [
     "pyarrow>=21.0.0",
     "seaborn>=0.13.2",
     "skfolio>=0.13.0",
+    "typer>=0.20.0",
 ]
 
 

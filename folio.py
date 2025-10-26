@@ -1,10 +1,13 @@
-from pprint import pprint as pp
-
 import polars as pl
+import typer
 
 from etfs import FACTORS, INDICES, get_etf_groups
 from hist import get_returns
 from model import run_opt
+
+pl.Config.set_tbl_hide_dataframe_shape(True)
+pl.Config.set_tbl_hide_column_data_types(True)
+app = typer.Typer()
 
 
 def get_scenarios(target):
@@ -22,13 +25,15 @@ def get_scenarios(target):
     # │ 2024-10-28 ┆ 0.003091  ┆ 0.000161  ┆ 0.01631   │
     # │ 2024-10-29 ┆ 0.001618  ┆ 0.009608  ┆ -0.003237 │
     # │ 2024-10-30 ┆ -0.003025 ┆ -0.007558 ┆ -0.001353 │
-    # │ 2024-10-31 ┆ -0.019603 ┆ -0.025243 ┆ -0.016619 │
-    # │ 2024-11-01 ┆ 0.004221  ┆ 0.007399  ┆ 0.005603  │
     # └────────────┴───────────┴───────────┴───────────┘
-    return {
-        'index_only': [returns[key] for key in [INDICES, target]],
-        'all': [returns[key] for key in [INDICES, FACTORS, target]],
-    }
+    print(returns)
+    if not returns[target].is_empty():
+        return {
+            'index_only': [returns[key] for key in [INDICES, target]],
+            'all': [
+                returns[key] for key in [INDICES, FACTORS, target]
+            ],
+        }
 
 
 def join(returns):
@@ -47,20 +52,24 @@ def join(returns):
 
 
 def get_opts(scenarios, target):
-    baskets = {
+    return {
         name: run_opt(join(returns), target)
         for name, returns in scenarios.items()
     }
-    print(baskets)
-    hedges = pl.DataFrame(
-        [dict(basket.rows()) for basket in baskets.values()],
-        orient='row',
-        schema=baskets.keys(),
-    )
-    pp(hedges.to_dicts())
 
 
+@app.command()
+def prompt():
+    while True:
+        symbol = typer.prompt('symbol')
+        scenarios = get_scenarios(symbol)
+        if scenarios:
+            baskets = get_opts(scenarios, symbol)
+            for name, basket in baskets.items():
+                print(f'({name})')
+                print(basket)
+
+
+# uv run -m folio SYMBOL
 if __name__ == '__main__':
-    target = 'jpm'
-    scenarios = get_scenarios(target)
-    get_opts(scenarios, target)
+    app()

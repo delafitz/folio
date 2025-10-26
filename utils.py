@@ -1,5 +1,5 @@
-from typing import Dict
 from pprint import pprint as pp
+from typing import Dict
 
 import polars as pl
 

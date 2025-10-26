@@ -33,7 +33,6 @@ def fetch_hist(symbols):
         ).rename({'close': symbol})
         hists.append(df)
     df_all = pl.concat(hists, how='align_left')
-    print(df_all.head())
     return df_all
 
 
@@ -52,7 +51,9 @@ def get_returns(name, symbols, force_fetch=False):
     hist = get_cache(name)
     if hist is None or force_fetch:
         hist = fetch_hist(symbols)
-    if not hist.is_empty():
+        if hist.is_empty():
+            print('NO HIST', name)
+            return hist
         write_cache(hist, name)
         return hist.with_columns(
             pl.all().exclude('date').pct_change()
