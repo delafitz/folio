@@ -14,5 +14,5 @@ def build_group(etfs):
 def get_etf_groups():
     return {
         INDICES: build_group([INDEX]),
-        FACTORS: build_group([SPDRS, ISHARES, OTHER]),
+        FACTORS: build_group([SPDRS, ISHARES]),
     }

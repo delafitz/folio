@@ -5,12 +5,21 @@ from skfolio.prior import EmpiricalPrior
 
 from timing import timeit
 
+MAX_BUDGET = 0
+THRESHOLD_LONG = 0.15
 CARDINALITY = 5
 L1_COEF = 1e-5
 
 
 @timeit
-def run_opt(X, target, l1_coef=L1_COEF, cardinality=CARDINALITY):
+def run_opt(
+    X,
+    target,
+    max_budget=MAX_BUDGET,
+    threshold_long=THRESHOLD_LONG,
+    cardinality=CARDINALITY,
+    l1_coef=L1_COEF,
+):
     model = MeanRisk(
         # need a MIP solver
         # SCIP is 3x slower than clarabel
@@ -23,12 +32,13 @@ def run_opt(X, target, l1_coef=L1_COEF, cardinality=CARDINALITY):
         prior_estimator=EmpiricalPrior(),
         objective_function=ObjectiveFunction.MINIMIZE_RISK,
         risk_measure=RiskMeasure.VARIANCE,
-        budget=None,
+        max_weights={target: -1},
         min_weights=-1,
         max_short=1.0,
-        max_weights={target: -1},
-        threshold_long=0.1,
         threshold_short=-1.0,
+        budget=None,
+        max_budget=max_budget,
+        threshold_long=threshold_long,
         l1_coef=l1_coef,
         cardinality=cardinality,
     )

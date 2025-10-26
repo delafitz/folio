@@ -52,8 +52,8 @@ def get_returns(name, symbols, force_fetch=False):
     if hist is None or force_fetch:
         hist = fetch_hist(symbols)
         if hist.is_empty():
-            print('NO HIST', name)
             return hist
+    if not hist.is_empty():
         write_cache(hist, name)
         return hist.with_columns(
             pl.all().exclude('date').pct_change()
