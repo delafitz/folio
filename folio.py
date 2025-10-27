@@ -11,7 +11,7 @@ app = typer.Typer()
 
 
 def get_scenarios(target):
-    # get hist returns for index/factor etf baskets and symbol
+    # get hist returns for index/factor etf baskets and symbol separately
     returns = {
         name: get_returns(name, symbols)
         for name, symbols in (
@@ -31,6 +31,7 @@ def get_scenarios(target):
         }
 
 
+# typer prompt for symbol
 @app.command()
 def prompt():
     while True:

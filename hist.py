@@ -5,7 +5,7 @@ from polygon import RESTClient
 
 from dates import get_dt_span, ts_to_date
 
-API_KEY = 'T9J9ukxYu5PlFfbbphx4KLkdoSVJmnF7'
+API_KEY = os.getenv('POLYGON_API_KEY')
 HIST_STORE = './cache/hist_data'
 
 

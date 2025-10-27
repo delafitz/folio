@@ -82,4 +82,6 @@ def run_opts(symbol, scenarios):
             if not basket.is_empty()
             else None
         )
-        print(basket, vols)
+        pl.Config.set_tbl_hide_dataframe_shape(True)
+        print(basket)
+        print(vols)
