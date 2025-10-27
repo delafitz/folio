@@ -83,5 +83,6 @@ def run_opts(symbol, scenarios):
             else None
         )
         pl.Config.set_tbl_hide_dataframe_shape(True)
+        pl.Config.set_float_precision(3)
         print(basket)
         print(vols)
