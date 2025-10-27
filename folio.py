@@ -3,8 +3,8 @@ import typer
 
 from etfs import FACTORS, INDICES, get_etf_groups
 from hist import get_returns
-from model import run_opt
-from utils import calc_risk, display, join
+from model import run_opts
+from utils import display, join
 
 pl.Config.set_tbl_hide_column_data_types(True)
 app = typer.Typer()
@@ -35,16 +35,9 @@ def get_scenarios(target):
 def prompt():
     while True:
         symbol = typer.prompt('symbol')
-
         scenarios = get_scenarios(symbol)
         if scenarios:
-            baskets = {
-                name: run_opt(returns.drop('date'), symbol)
-                for name, returns in scenarios.items()
-            }
-            display(baskets)
-            for name, basket in baskets.items():
-                calc_risk(symbol, basket, scenarios['all_etfs'])
+            run_opts(symbol, scenarios)
 
 
 # uv run -m folio SYMBOL

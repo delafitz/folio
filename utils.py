@@ -3,8 +3,6 @@ from typing import Dict
 
 import polars as pl
 
-DAILY_ANN = 252**0.5 * 100
-
 
 def to_dicts(dfs: Dict):
     all = pl.DataFrame(
@@ -34,34 +32,3 @@ def join(returns):
     # │ 0.001618  ┆ 0.009608  ┆ -0.003237 ┆ -0.01153  │
     # │ 0.004221  ┆ 0.007399  ┆ 0.005603  ┆ 0.004596  │
     # └───────────┴───────────┴───────────┴───────────┘
-
-
-def calc_risk(target, basket, all_returns):
-    basket_weights = dict(
-        zip(basket[target].to_list(), basket['weight'].to_list())
-    )
-    wtd_basket_returns = (
-        all_returns.select(list(basket_weights.keys()))
-        .with_columns(
-            [
-                pl.col(symbol) * weight
-                for symbol, weight in basket_weights.items()
-            ]
-        )
-        .sum_horizontal()
-        .alias('basket')
-    )
-    print(wtd_basket_returns)
-    print(all_returns.select(target))
-    # vols = (
-    #     pl.DataFrame(
-    #         [all_returns.select(target), wtd_basket_returns],
-    #     )
-    #     .with_columns(
-    #         (pl.col(target) - pl.col('basket')).alias('hedged')
-    #     )
-    #     .select(pl.all())
-    #     .std()
-    #     * DAILY_ANN
-    # )
-    # print(vols)

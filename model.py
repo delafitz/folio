@@ -3,18 +3,19 @@ from skfolio.measures import RiskMeasure
 from skfolio.optimization import MeanRisk, ObjectiveFunction
 from skfolio.prior import EmpiricalPrior
 
+from risk import calc_vols
 from timing import timeit
 
-MAX_BUDGET = 0
-THRESHOLD_LONG = 0.15
+MAX_BUDGET = 0.5
+THRESHOLD_LONG = 0.10
 CARDINALITY = 5
 L1_COEF = 1e-5
 
 
 @timeit
 def run_opt(
-    X,
     target,
+    X,
     max_budget=MAX_BUDGET,
     threshold_long=THRESHOLD_LONG,
     cardinality=CARDINALITY,
@@ -68,3 +69,17 @@ def run_opt(
     # │ XME ┆ 0.1      │
     # └─────┴──────────┘
     return weights
+
+
+def run_opts(symbol, scenarios):
+    baskets = {
+        name: run_opt(symbol, returns.drop('date'))
+        for name, returns in scenarios.items()
+    }
+    for _, basket in baskets.items():
+        vols = (
+            calc_vols(symbol, basket, scenarios['all_etfs'])
+            if not basket.is_empty()
+            else None
+        )
+        print(basket, vols)
