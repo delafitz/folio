@@ -1,4 +1,5 @@
 ```
+[~/p/port] (main)--> uv run -m folio
 symbol: nvda
 run_opt took 0.0835 seconds
 run_opt took 0.0469 seconds
